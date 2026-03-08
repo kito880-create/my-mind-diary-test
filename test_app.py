@@ -65,6 +65,11 @@ def get_all_dates_with_logs():
 # --- SECTION 3: AI Logic ---
 def analyze_diary(api_key, diary_text, tone_v, style_v, focus_v):
     if not api_key: return None
+    # 로버스트한 API 키 클리닝 (실수로 GOOGLE_API_KEY = "..." 전체를 붙여넣은 경우 대비)
+    api_key = api_key.strip()
+    if "=" in api_key: api_key = api_key.split("=")[-1].strip()
+    api_key = api_key.strip('"').strip("'").strip()
+    
     t_ins = TONE_DESCRIPTIONS.get(tone_v); s_ins = STYLE_DESCRIPTIONS.get(style_v); f_ins = FOCUS_DESCRIPTIONS.get(focus_v)
     
     prompt = f"""
@@ -112,6 +117,10 @@ def analyze_diary(api_key, diary_text, tone_v, style_v, focus_v):
 
 def generate_monthly_insight(api_key, text, t_v, s_v, f_v):
     if not api_key: return "API Key 필요"
+    api_key = api_key.strip()
+    if "=" in api_key: api_key = api_key.split("=")[-1].strip()
+    api_key = api_key.strip('"').strip("'").strip()
+    
     t_ins = TONE_DESCRIPTIONS.get(t_v); s_ins = STYLE_DESCRIPTIONS.get(s_v); f_ins = FOCUS_DESCRIPTIONS.get(f_v)
     prompt = f"심층 분석가로서 말투:{t_ins}, 성향:{s_ins}, 방향:{f_ins}을 반영해 보름/월간 리포트 작성.\n\n[데이터]\n{text}"
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
